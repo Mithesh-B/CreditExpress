@@ -10,7 +10,7 @@ function RegisterPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    isAdmin: true, 
+    isAdmin: false, 
   });
 
 

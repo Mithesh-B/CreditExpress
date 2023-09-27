@@ -8,10 +8,11 @@ const User = require("./models/User");
 const cors = require("cors");
 
 const app = express();
+//prevent cors error
 app.use(cors());
 
 
-
+//connect mongoDB (update to .env later)
 mongoose
   .connect("mongodb://127.0.0.1/creditExpress", {
     useNewUrlParser: true,
@@ -53,7 +54,7 @@ app.post("/register", async (req, res) => {
   }
 });
 
-// Login
+// post request to login
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -77,53 +78,92 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-
+//post request to avail a loan
 app.post("/loan/:userId", async (req, res) => {
   try {
-    const { loanAmount, term } = req.body;
-    const userId = req.params.userId; // Get the user ID from the URL parameter
+    const { loanAmount, term, requestDate, status } = req.body;
+    const userId = req.params.userId;
 
-    // Find the user by ID (you should validate it)
+    // Find the user by ID
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Store the loan data for the user
-    user.loan.loanAmount = loanAmount;
-    user.loan.term = term;
+    // Check if the user has an active loan or if the previous loan is paid
+    if (!user.loan || user.loan.isPaid || user.loan.status === "DISABLED") {
+      // Create a new loan object for the user
+      user.loan = {
+        loanAmount,
+        term,
+        requestDate,
+        status,
+        paidAmount: 0,
+        isPaid: false,
+        installmentPayments: [],
+      };
+    } else {
+      return res.status(400).json({
+        message: "Cannot create a new loan. Active loan or unpaid loan exists.",
+      });
+    }
 
     await user.save();
 
-    res.status(200).json({ message: "Loan data stored successfully" });
+    res.status(200).json({ message: "New loan created successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-app.get("/loan/:userId", async (req, res) => {
+//post request for loan repayment
+app.post("/repay/:userId", async (req, res) => {
   try {
-    const userId = req.params.userId; // Get the user ID from the URL parameter
+    const { repaymentAmount, installmentNumber } = req.body;
+    const userId = req.params.userId;
 
-    // Find the user by ID (you should validate it)
+    // Find the user by ID
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Check if the user has loan data
-    if (!user.loan || !user.loan.loanAmount || !user.loan.term) {
-      return res
-        .status(404)
-        .json({ message: "Loan data not found for this user" });
+    const repaymentAmountNumber = parseFloat(repaymentAmount);
+
+    // Check if the loan is active and not paid yet
+    if (user.loan.status === "ACTIVE" && !user.loan.isPaid) {
+      // Check if the installment is already paid
+      if (
+        user.loan.installmentPayments.some(
+          (payment) => payment.installmentNumber === installmentNumber
+        )
+      ) {
+        return res.status(400).json({ message: "Installment already paid" });
+      }
+
+      // Update the paid amount and deduct it from the remaining loan amount
+      user.loan.paidAmount += repaymentAmountNumber;
+      user.loan.loanAmount -= repaymentAmountNumber;
+
+      // Check if the loan is fully paid
+      if (user.loan.loanAmount <= 0) {
+        user.loan.isPaid = true;
+        user.loan.status = "DISABLED";
+      }
+
+      // Add the payment to the installmentPayments array
+      user.loan.installmentPayments.push({
+        installmentNumber,
+        paymentAmount: repaymentAmountNumber,
+      });
+
+      await user.save();
+
+      res.status(200).json(user.loan);
+    } else {
+      res.status(400).json({ message: "Loan is not active or already paid" });
     }
-
-    // Retrieve loan data for the user
-    const loanAmount = user.loan.loanAmount;
-    const term = user.loan.term;
-
-    res.status(200).json({ loanAmount, term });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server error" });
@@ -131,10 +171,80 @@ app.get("/loan/:userId", async (req, res) => {
 });
 
 
+//get loan status for specific user
+app.get("/loan-status/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
 
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
+    // Return the loan status and other loan details
+    const loanStatus = user.loan.status;
+    const isLoanPaid = user.loan.isPaid;
+        const loanAmount = user.loan.loanAmount;
+        const term = user.loan.term;
+    const requestDate = user.loan.requestDate;
+    const installment = user.loan.installmentPayments;
+    const isAdmin= user.isAdmin
 
+    res.status(200).json({
+      loanStatus,
+      isLoanPaid,
+      loanAmount,
+      term,
+      requestDate,
+      installment,
+      isAdmin,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+//get all users loan details
+app.get("/all-loans", async (req, res) => {
+  try {
+    // Find all users with their loan objects
+    const users = await User.find({}, { username: 1, loan: 1 });
 
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+//post req to update loan status by admin
+app.post("/approve-loan/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if the user's loan status is "PENDING"
+    if (user.loan.status === "PENDING") {
+      // Change the loan status to "ACTIVE"
+      user.loan.status = "ACTIVE";
+      await user.save();
+
+      res
+        .status(200)
+        .json({ message: "Loan approved and status changed to ACTIVE" });
+    } else {
+      res.status(400).json({ message: "Loan is not in PENDING status" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 
 

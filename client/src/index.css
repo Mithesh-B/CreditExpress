@@ -1,5 +1,17 @@
 :root{
-  margin: 0;
-  padding: 0;
+  margin: 0px;
+  padding: 0px;
   box-sizing: border-box;
+  font-family: 'Switzer', sans-serif;
+
+
+}
+
+
+h1{
+  font-weight: 600;
+}
+h3{
+  font-size: 1rem;
+  font-weight: 500;
 }

@@ -1,0 +1,164 @@
+//dashboard
+
+.header-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .db-container {
+    margin: 1rem 2rem 1rem 2rem;
+
+    .db-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+  .table-width {
+    margin: 0rem 2rem 1rem 2rem;
+    overflow-x: scroll;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-container {
+    margin: 0rem;
+  }
+
+  .table-width {
+    margin: 0rem 1rem 1rem 1rem;
+  }
+}
+
+//hero
+.hero {
+  margin: 0;
+  padding-top: 2rem;
+  display: flex;
+  justify-content: space-around;
+
+  .h-title {
+    font-family: "Stardom", sans-serif;
+    font-size: 4rem;
+    letter-spacing: 3px;
+  }
+  .h-img {
+    display: flex;
+    position: relative;
+    align-items: center;
+    img {
+      width: 35rem;
+      height: auto;
+    }
+    .img-txt {
+      color: #f1f1f1;
+      position: absolute;
+      font-weight: 400;
+      font-size: 0.9rem;
+      width: 45%;
+      top: 0.1rem;
+      left: 1rem;
+    }
+  }
+  .form-bg {
+    background-image: repeating-radial-gradient(
+        circle at 0 0,
+        transparent 0,
+        #e5e5f7 40px
+      ),
+      repeating-linear-gradient(#1e8f7155, #1e8f7152);
+    padding: 20px;
+    border-radius: 15px;
+    width: 80%;
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+
+      div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        margin-bottom: 10px;
+        width: 100%;
+      }
+
+      label {
+        color: #020202;
+        font-weight: 500;
+        width: 50%;
+        font-size: 1rem;
+      }
+      input {
+        font-family: inherit;
+      }
+
+      input[type="number"],
+      input[type="date"] {
+        background-color: #f2f5f4;
+
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #cccccc00;
+        border-radius: 6px;
+        outline: none;
+        margin-left: 5rem;
+      }
+
+      button {
+        margin-top: 0.5rem;
+        padding: 7px 15px;
+
+        font-family: "Switzer", sans-serif;
+        background-color: #1b1b1b;
+        color: #fff;
+        border: none;
+        border-radius: 7px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: #0c0c0c;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding-top: 1rem;
+    margin-top: 0rem;
+    flex-direction: column;
+    margin: 0.5rem;
+
+    .form-bg {
+      width: auto;
+
+      form {
+        input[type="number"],
+        input[type="date"] {
+          margin-left: 1rem;
+        }
+      }
+    }
+    .h-img {
+      img {
+        display: none;
+      }
+      .img-txt {
+        color: #1b1a1a;
+        position: relative;
+        font-weight: 400;
+        font-size: 0.9rem;
+        width: 100%;
+        top: 0rem;
+        padding-top: 2rem;
+        left: 0rem;
+      }
+    }
+  }
+}
