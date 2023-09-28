@@ -24,7 +24,7 @@ const Login = () => {
   const login = (e) => {
     e.preventDefault();
     axios
-      .post("http://localhost:3000/login", formValues)
+      .post("https://creditexpress.onrender.com/login", formValues)
       .then((res) => {
         if (res.data.message === "Wrong Credentials!") {
           alert(res.data.message);

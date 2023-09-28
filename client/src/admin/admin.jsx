@@ -12,7 +12,7 @@ const Admin = () => {
   // Make an API GET call
   useEffect(() => {
     axios
-      .get("http://localhost:3000/all-loans")
+      .get("https://creditexpress.onrender.com/all-loans")
       .then((response) => {
         setData(response.data);
         setLoading(false);
@@ -25,12 +25,11 @@ const Admin = () => {
   // Make an API POST request to update the status
   const handleActionClick = (loanId) => {
     axios
-      .post(`http://localhost:3000/approve-loan/${loanId}`)
+      .post(`https://creditexpress.onrender.com/approve-loan/${loanId}`)
       .then((response) => {
         // Handle the success response here
         message.success("Status updated successfully");
         window.location.reload();
-       
       })
       .catch((error) => {
         console.error("Error updating status:", error);

@@ -18,7 +18,7 @@ const Dashboard = () => {
 
   //gets current user data on login
   useEffect(() => {
-    const apiUrl = `http://localhost:3000/loan-status/${userId}`;
+    const apiUrl = `https://creditexpress.onrender.com/loan-status/${userId}`;
 
     fetch(apiUrl)
       .then((response) => {
@@ -50,7 +50,7 @@ const Dashboard = () => {
     try {
       // Make an API call to send the loan request data
       const response = await axios.post(
-        `http://localhost:3000/loan/${userId}`,
+        `https://creditexpress.onrender.com/loan/${userId}`,
         {
           loanAmount: parseFloat(loanAmount),
           term: parseInt(term),
@@ -78,16 +78,19 @@ const Dashboard = () => {
   const onPaymentSubmit = async (paymentAmount, installmentNumber) => {
     try {
       // Make a POST request to submit installments
-      const response = await fetch(`http://localhost:3000/repay/${userId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          repaymentAmount: paymentAmount,
-          installmentNumber: installmentNumber,
-        }),
-      });
+      const response = await fetch(
+        `https://creditexpress.onrender.com/repay/${userId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            repaymentAmount: paymentAmount,
+            installmentNumber: installmentNumber,
+          }),
+        }
+      );
 
       if (response.status === 200) {
         message.success("Status updated successfully");
