@@ -3,17 +3,16 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Table, Button, Input, message } from "antd";
 import Admin from "../admin/admin";
-import "./dashboard.scss"
+import "./dashboard.scss";
 
-
-const Products = () => {
+const Dashboard = () => {
   const navigate = useNavigate();
   const [loan, setLoan] = useState([]);
   const [loanAmount, setLoanAmount] = useState("");
   const [term, setTerm] = useState("");
-  const [requestDate, setRequestDate] = useState("2022-02-07");
+  const [requestDate, setRequestDate] = useState("2023-02-07");
   const [installments, setInstallments] = useState([]);
-    const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const userId = sessionStorage.getItem("userID");
 
@@ -29,11 +28,11 @@ const Products = () => {
       })
       .then((data) => {
         setLoan(data);
-           setLoading(false);
+        setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
-           setLoading(false);
+        setLoading(false);
       });
   }, []);
 
@@ -59,16 +58,18 @@ const Products = () => {
       );
 
       // Handle success, e.g., show a success message or redirect to a confirmation page
-          message.success("Successfully submitted a loan request, please wait for approval");
+      message.success(
+        "Successfully submitted a loan request, please wait for approval"
+      );
 
       // Clear the form fields after submission
       setLoanAmount("");
       setTerm("");
-      setRequestDate("2022-02-07");
+      setRequestDate("2023-02-07");
     } catch (error) {
-        message.error(
-          "Cannot create a new loan. Active loan or unpaid loan exists"
-        );
+      message.error(
+        "Cannot create a new loan. Active loan or unpaid loan exists"
+      );
       // Handle error, e.g., display an error message to the user
     }
   };
@@ -92,16 +93,28 @@ const Products = () => {
         window.location.reload();
       } else {
         // Handle error responses from the server
-        const data = await response.json();
-        alert(data.message); // Display an error message to the user
+        const data = await response.json(); // Display an error message to the user
+        message.error("Installment already paid");
       }
     } catch (error) {
       console.error(error);
       // Handle network or other errors here
-      alert("Error submitting payment");
+      message.error("Error submitting payment");
     }
   };
 
+  // Get the last object in the installment array
+  const lastInstallment = loan?.installment?.slice(-1)[0];
+
+  // Get the installmentNumber of the last installment
+  const lastInstallmentNumber = lastInstallment?.installmentNumber || 0;
+
+  const pendingInstallments = (
+    loan.loanAmount /
+    (installments.length - lastInstallmentNumber)
+  );
+
+  console.log(pendingInstallments)
   useEffect(() => {
     if (loan && loan.term) {
       const term = parseInt(loan.term, 10);
@@ -133,8 +146,9 @@ const Products = () => {
   };
 
   const handlePaymentSubmit = (index) => {
-    if (installments[index].paymentAmount <= 0) {
-      alert("Payment amount must be greater than zero.");
+    if (installments[index].paymentAmount <= pendingInstallments-1) {
+      
+      message.error("Payment amount must be greater than installment amount.");
       return;
     }
 
@@ -146,12 +160,15 @@ const Products = () => {
     // Update the payment status for this installment
   };
 
-  if (loan.loanStatus === "DISABLED" || loan.loanStatus === "PENDING" && !loan.isAdmin) {
+  if (
+    loan.loanStatus === "DISABLED" ||
+    (loan.loanStatus === "PENDING" && !loan.isAdmin)
+  ) {
     return (
       <div>
         {" "}
         <div className="hero">
-          <div>
+          <div className="h-left">
             <h1 className="h-title">
               Get your loan in <br />2 steps! <br />
               It's that easy
@@ -181,7 +198,7 @@ const Products = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="requestDate">Request Date:</label>
+                  <label htmlFor="requestDate">Term start date:</label>
                   <input
                     type="date"
                     id="requestDate"
@@ -190,9 +207,11 @@ const Products = () => {
                     required
                   />
                 </div>
-                <div style={{display: "flex", justifyContent: "space-between"}}>
-                <button type="submit">Submit Request</button>
-                <button onClick={handleLogout}>Logout</button>
+                <div
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
+                  <button type="submit">Submit Request</button>
+                  <button onClick={handleLogout}>Logout</button>
                 </div>
               </form>
             </div>
@@ -209,14 +228,7 @@ const Products = () => {
         </div>
       </div>
     );
-  } 
-
-  // Get the last object in the installment array
-  const lastInstallment = loan?.installment?.slice(-1)[0];
-
-  // Get the installmentNumber of the last installment
-  const lastInstallmentNumber = lastInstallment?.installmentNumber || 0;
-  console.log(lastInstallmentNumber);
+  }
 
   const columns = [
     {
@@ -241,10 +253,7 @@ const Products = () => {
         return loan.installment[index] &&
           loan.installment[index].paymentAmount > 0
           ? "$0.00"
-          : `$${(
-              loan.loanAmount /
-              (installments.length - lastInstallmentNumber)
-            ).toFixed(2)}`;
+          : `$${pendingInstallments}`;
       },
     },
     {
@@ -277,14 +286,18 @@ const Products = () => {
             </Button>
           );
         }
-        return null; // No action button if the installment is already paid
+        return null;
       },
     },
   ];
 
-   if (loading) {
-     return <div>Loading...</div>; // You can customize this loading indicator
-   }
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-circle"></div>
+      </div>
+    );
+  }
 
   return loan.isAdmin ? (
     <Admin />
@@ -295,9 +308,11 @@ const Products = () => {
           <h1>Your Loan Details</h1>
           <Button onClick={handleLogout}>Logout</Button>
         </div>
-        <h3>Loan amount to be paid : ${loan?.loanAmount}</h3>
-        <h3>Installment Term: {loan?.term}</h3>
-        <h3>Term start: {loan?.requestDate}</h3>
+        <h3 className="db-subheading">
+          Loan amount to be paid : ${loan?.loanAmount}
+        </h3>
+        <h3 className="db-subheading">Installment Term: {loan?.term}</h3>
+        <h3 className="db-subheading">Term start: {loan?.requestDate}</h3>
       </div>
       <div className="table-width">
         <Table
@@ -311,6 +326,5 @@ const Products = () => {
       </div>
     </div>
   );
-  
-}
-export default Products;
+};
+export default Dashboard;

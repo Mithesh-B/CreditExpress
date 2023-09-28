@@ -1,20 +1,16 @@
 import Login from "./loginAPI/login.jsx";
-import Products from "./dashboard/dashboard.jsx";
+import Dashboard from "./dashboard/dashboard.jsx";
 import RegisterPage from "./register/register.jsx";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import axios from "axios";
-import "./App.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
- const signIn = sessionStorage.getItem("isLoggedIn");
+  const signIn = sessionStorage.getItem("isLoggedIn");
 
   return (
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={signIn ? <Products /> : <Login />}></Route>
- 
+          <Route path="/" element={signIn ? <Dashboard /> : <Login />}></Route>
           <Route path="/register" element={<RegisterPage />}></Route>
         </Routes>
       </BrowserRouter>
