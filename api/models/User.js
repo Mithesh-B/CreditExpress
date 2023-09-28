@@ -1,4 +1,4 @@
-// models/User.js
+//user schema
 
 const mongoose = require("mongoose");
 
@@ -12,8 +12,8 @@ const loanSchema = new mongoose.Schema({
   term: { type: Number },
   requestDate: { type: String },
   status: { type: String },
-  paidAmount: { type: Number, default: 0 }, // New field for tracking paid amount
-  isPaid: { type: Boolean, default: false }, // New field for marking the loan as paid
+  paidAmount: { type: Number, default: 0 }, 
+  isPaid: { type: Boolean, default: false }, 
   installmentPayments: [installmentPaymentSchema],
 });
 
