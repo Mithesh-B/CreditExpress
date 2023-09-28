@@ -1,7 +1,12 @@
 # Credit Express
 
 Credit Express is a web application for managing loans. It allows registered users to avail loans and administrators to approve loans. Users can fulfill loans on a weekly term, and certain rules apply to the loan fulfillment process.
+
+![scrnli_9_28_2023_2-53-02 PM](https://github.com/Mithesh-B/CreditExpress/assets/115478939/cac43c2e-4e04-414a-9284-d07758f6e0b1)
+
 ![scrnli_9_28_2023_12-20-04 PM](https://github.com/Mithesh-B/CreditExpress/assets/115478939/ff457113-c268-4849-a064-43ec2f6bd7a0)
+
+![scrnli_9_28_2023_2-53-41 PM](https://github.com/Mithesh-B/CreditExpress/assets/115478939/bfe55360-d79c-4474-822e-bafe97a8706b)
 
 ## Technologies Used
 
