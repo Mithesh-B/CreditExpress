@@ -12,7 +12,7 @@ function RegisterPage() {
     confirmPassword: "",
     isAdmin: false,
   });
-
+  //handle form
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormValues({
@@ -21,6 +21,7 @@ function RegisterPage() {
     });
   };
 
+  //register a new user
   const register = (e) => {
     e.preventDefault();
     const { username, email, password, confirmPassword } = formValues;

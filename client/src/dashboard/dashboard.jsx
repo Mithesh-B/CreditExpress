@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Table, Button, Input, message } from "antd";
 import Admin from "../admin/admin";
@@ -16,6 +16,7 @@ const Dashboard = () => {
 
   const userId = sessionStorage.getItem("userID");
 
+  //gets current user data on login
   useEffect(() => {
     const apiUrl = `http://localhost:3000/loan-status/${userId}`;
 
@@ -36,6 +37,7 @@ const Dashboard = () => {
       });
   }, []);
 
+  //logs out the user
   const handleLogout = () => {
     sessionStorage.clear();
     navigate("/");
@@ -46,18 +48,18 @@ const Dashboard = () => {
     e.preventDefault();
 
     try {
-      // Make an API call to send the loan request data to the backend
+      // Make an API call to send the loan request data
       const response = await axios.post(
         `http://localhost:3000/loan/${userId}`,
         {
-          loanAmount: parseFloat(loanAmount), // Ensure loan amount is a number
-          term: parseInt(term), // Ensure term is an integer
+          loanAmount: parseFloat(loanAmount),
+          term: parseInt(term),
           requestDate: requestDate,
-          status: "PENDING", // Set the initial status to PENDING
+          status: "PENDING",
         }
       );
 
-      // Handle success, e.g., show a success message or redirect to a confirmation page
+      // Handle success
       message.success(
         "Successfully submitted a loan request, please wait for approval"
       );
@@ -70,13 +72,12 @@ const Dashboard = () => {
       message.error(
         "Cannot create a new loan. Active loan or unpaid loan exists"
       );
-      // Handle error, e.g., display an error message to the user
     }
   };
 
   const onPaymentSubmit = async (paymentAmount, installmentNumber) => {
     try {
-      // Make a POST request to your backend API to submit the payment
+      // Make a POST request to submit installments
       const response = await fetch(`http://localhost:3000/repay/${userId}`, {
         method: "POST",
         headers: {
@@ -92,29 +93,24 @@ const Dashboard = () => {
         message.success("Status updated successfully");
         window.location.reload();
       } else {
-        // Handle error responses from the server
-        const data = await response.json(); // Display an error message to the user
+        // Handle error response
+        const data = await response.json();
         message.error("Installment already paid");
       }
     } catch (error) {
       console.error(error);
-      // Handle network or other errors here
+
       message.error("Error submitting payment");
     }
   };
 
-  // Get the last object in the installment array
+  //get required payment installment
   const lastInstallment = loan?.installment?.slice(-1)[0];
-
-  // Get the installmentNumber of the last installment
   const lastInstallmentNumber = lastInstallment?.installmentNumber || 0;
+  const pendingInstallments =
+    loan.loanAmount / (installments.length - lastInstallmentNumber);
 
-  const pendingInstallments = (
-    loan.loanAmount /
-    (installments.length - lastInstallmentNumber)
-  );
-
-  console.log(pendingInstallments)
+  console.log(pendingInstallments);
   useEffect(() => {
     if (loan && loan.term) {
       const term = parseInt(loan.term, 10);
@@ -146,8 +142,7 @@ const Dashboard = () => {
   };
 
   const handlePaymentSubmit = (index) => {
-    if (installments[index].paymentAmount <= pendingInstallments-1) {
-      
+    if (installments[index].paymentAmount <= pendingInstallments - 1) {
       message.error("Payment amount must be greater than installment amount.");
       return;
     }
@@ -156,10 +151,8 @@ const Dashboard = () => {
       installments[index].paymentAmount,
       installments[index].installmentNumber
     );
-
-    // Update the payment status for this installment
   };
-
+  //user landing page
   if (
     loan.loanStatus === "DISABLED" ||
     (loan.loanStatus === "PENDING" && !loan.isAdmin)
@@ -229,7 +222,7 @@ const Dashboard = () => {
       </div>
     );
   }
-
+  //table component is handled using ANTDesign table
   const columns = [
     {
       title: "Installments",
@@ -291,6 +284,7 @@ const Dashboard = () => {
     },
   ];
 
+  //loader
   if (loading) {
     return (
       <div className="loading-container">

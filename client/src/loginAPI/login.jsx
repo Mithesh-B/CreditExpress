@@ -10,6 +10,8 @@ const Login = () => {
     email: "",
     password: "",
   });
+
+  //handle form
   const handleChange = (event) => {
     const { name, value } = event.target;
     handleForm({
@@ -18,6 +20,7 @@ const Login = () => {
     });
   };
 
+  //API that sends email and password to backend for validation.(bcrypt is used for hashing)
   const login = (e) => {
     e.preventDefault();
     axios

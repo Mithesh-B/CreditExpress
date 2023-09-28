@@ -9,10 +9,10 @@ const Admin = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Make an API GET call
   useEffect(() => {
-    // Make an API GET call to fetch data when the component mounts
     axios
-      .get("http://localhost:3000/all-loans") // Replace with your actual GET API endpoint
+      .get("http://localhost:3000/all-loans")
       .then((response) => {
         setData(response.data);
         setLoading(false);
@@ -22,23 +22,22 @@ const Admin = () => {
         setLoading(false);
       });
   }, []);
-
+  // Make an API POST request to update the status
   const handleActionClick = (loanId) => {
-    // Make an API POST request to update the status
     axios
-      .post(`http://localhost:3000/approve-loan/${loanId}`) // Replace with your actual POST API endpoint
+      .post(`http://localhost:3000/approve-loan/${loanId}`)
       .then((response) => {
         // Handle the success response here
         message.success("Status updated successfully");
         window.location.reload();
-        // You can also update the status locally in your data state if needed
+       
       })
       .catch((error) => {
         console.error("Error updating status:", error);
         message.error("status is already active");
       });
   };
-
+//table component is handled using ANTDesign table
   const columns = [
     {
       title: "Username",
