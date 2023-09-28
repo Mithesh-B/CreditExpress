@@ -8,13 +8,14 @@ const User = require("./models/User");
 const cors = require("cors");
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 //prevent cors error
 app.use(cors());
 
 
 //connect mongoDB (update to .env later)
 mongoose
-  .connect("mongodb://127.0.0.1/creditExpress", {
+  .connect(process.env.MONGO_URI || 3000, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -248,7 +249,7 @@ app.post("/approve-loan/:userId", async (req, res) => {
 
 
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
   console.log(`Server is running`);
 });
 
