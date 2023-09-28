@@ -35,9 +35,6 @@ You can access the live web application here: [Credit Express](https://creditexp
 
 - **Loan Eligibility**: Users can apply for a new loan only if their past loan has been paid.
 
-## Contributing
-If you'd like to contribute to this project, please read the Contributing Guidelines.
-
 ## License
 This project is licensed under the MIT License.
 
