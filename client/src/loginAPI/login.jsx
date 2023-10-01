@@ -1,11 +1,14 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { message, Tooltip, Button } from "antd";
 import axios from "axios";
 import { useState } from "react";
 import "./login.scss";
 
+
 const Login = () => {
   const Navigate = useNavigate();
+  const [buttonText, setButtonText] = useState("Sign-In");
   const [formValues, handleForm] = useState({
     email: "",
     password: "",
@@ -23,11 +26,17 @@ const Login = () => {
   //API that sends email and password to backend for validation.(bcrypt is used for hashing)
   const login = (e) => {
     e.preventDefault();
+
+    if (!formValues.email || !formValues.password) {
+      message.error("Please fill in all fields");
+      return;
+    }
+    setButtonText("Preparing your portal..");
+
     axios
-      .post("https://creditexpress.onrender.com/login", formValues)
+      .post(`${import.meta.env.VITE_API}/login`, formValues)
       .then((res) => {
-        if (res.data.message === "Wrong Credentials!") {
-          alert(res.data.message);
+        if (res.data.message === "Invalid credentials") {
         } else {
           window.sessionStorage.setItem("isLoggedIn", true);
           window.sessionStorage.setItem("userID", res.data?.userId);
@@ -37,8 +46,21 @@ const Login = () => {
       })
       .catch((err) => {
         console.log(err);
+        setButtonText("errr..or! :(");
+        message.error("please check your email or password and try again");
       });
   };
+
+  const multilineContent = (
+    <div>
+      Admin account- <br /> 
+      email: admin@mail.com <br /> password: 123 <br />
+      <br />
+      Customer account- <br />
+      email: test2@mail.com <br /> password: 123 <br />
+    </div>
+  );
+
   return (
     <div className="login-container">
       <div className="left">
@@ -48,7 +70,19 @@ const Login = () => {
       </div>
       <div className="right">
         <div className="right-container">
-          <h1 className="right-title">Sign-in</h1>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "normal",
+            }}
+          >
+            <h1 className="right-title">Sign-in</h1>
+            <Tooltip title={multilineContent}>
+              <Button>Hover me</Button>
+            </Tooltip>
+          </div>
+
           <p className="right-subtitle">Sign in to your account</p>
           <form className="login-form" onSubmit={login}>
             <div className="form-container">
@@ -70,8 +104,12 @@ const Login = () => {
                 type="password"
                 placeholder="Your password"
               ></input>
-              <button className="login-button" type="submit">
-                Sign-In
+              <button
+                className="login-button"
+                type="submit"
+         
+              >
+                {buttonText}
               </button>
             </div>
           </form>

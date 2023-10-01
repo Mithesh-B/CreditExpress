@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../dashboard/dashboard.scss";
 
+
 const Admin = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
@@ -12,7 +13,7 @@ const Admin = () => {
   // Make an API GET call
   useEffect(() => {
     axios
-      .get("https://creditexpress.onrender.com/all-loans")
+      .get(`${import.meta.env.VITE_API}/all-loans`)
       .then((response) => {
         setData(response.data);
         setLoading(false);
@@ -25,7 +26,7 @@ const Admin = () => {
   // Make an API POST request to update the status
   const handleActionClick = (loanId) => {
     axios
-      .post(`https://creditexpress.onrender.com/approve-loan/${loanId}`)
+      .post(`${import.meta.env.VITE_API}/approve-loan/${loanId}`)
       .then((response) => {
         // Handle the success response here
         message.success("Status updated successfully");

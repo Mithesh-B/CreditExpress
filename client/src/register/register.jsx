@@ -4,6 +4,7 @@ import { message } from "antd";
 import axios from "axios";
 import "../loginAPI/login.scss";
 
+
 function RegisterPage() {
   const [formValues, setFormValues] = useState({
     username: "",
@@ -35,7 +36,7 @@ function RegisterPage() {
       };
 
       axios
-        .post("https://creditexpress.onrender.com/register", formData)
+        .post(`${import.meta.env.VITE_API}/register`, formData)
         .then((res) => {
           message.success("Sucessfully registered. Please sign-in");
         })

@@ -5,6 +5,7 @@ import { Table, Button, Input, message } from "antd";
 import Admin from "../admin/admin";
 import "./dashboard.scss";
 
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [loan, setLoan] = useState([]);
@@ -18,7 +19,7 @@ const Dashboard = () => {
 
   //gets current user data on login
   useEffect(() => {
-    const apiUrl = `https://creditexpress.onrender.com/loan-status/${userId}`;
+    const apiUrl = `${import.meta.env.VITE_API}/loan-status/${userId}`;
 
     fetch(apiUrl)
       .then((response) => {
@@ -50,7 +51,7 @@ const Dashboard = () => {
     try {
       // Make an API call to send the loan request data
       const response = await axios.post(
-        `https://creditexpress.onrender.com/loan/${userId}`,
+        `${import.meta.env.VITE_API}/loan/${userId}`,
         {
           loanAmount: parseFloat(loanAmount),
           term: parseInt(term),
@@ -79,7 +80,7 @@ const Dashboard = () => {
     try {
       // Make a POST request to submit installments
       const response = await fetch(
-        `https://creditexpress.onrender.com/repay/${userId}`,
+        `${import.meta.env.VITE_API}/repay/${userId}`,
         {
           method: "POST",
           headers: {
@@ -114,6 +115,7 @@ const Dashboard = () => {
     loan.loanAmount / (installments.length - lastInstallmentNumber);
 
   console.log(pendingInstallments);
+
   useEffect(() => {
     if (loan && loan.term) {
       const term = parseInt(loan.term, 10);
@@ -296,7 +298,7 @@ const Dashboard = () => {
     );
   }
 
-  return loan.isAdmin ? (
+  return  loan.isAdmin? (
     <Admin />
   ) : (
     <div className="header-container">
