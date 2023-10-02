@@ -24,6 +24,8 @@ Credit Express is a web application for managing loans. It allows registered use
 - Express.js (Web framework)
 - MongoDB (Database)
 - Bcrypt (Authentication)
+- JWT (Authorization)
+- express-rate-limit
 
 ## Demo
 
