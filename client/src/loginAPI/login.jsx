@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { message, Tooltip, Button } from "antd";
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./login.scss";
 
 
@@ -13,6 +13,24 @@ const Login = () => {
     email: "",
     password: "",
   });
+
+  /*just a useEffect call that runs every 10 mins and on 
+  initial mount to prevent backend server from going to sleep because (free hosting problems LMAO)*/
+   const wakeUpServer = async () => {
+     try {
+       await fetch("https://creditexpress.onrender.com/");
+       console.log("Server is awake!");
+     } catch (error) {
+       console.error("Error waking up the server:", error);
+     }
+   };
+
+   useEffect(() => {
+     wakeUpServer();
+     const intervalId = setInterval(wakeUpServer, 10 * 60 * 1000); // 10 minutes
+     // Clean up the interval when the component is unmounted
+     return () => clearInterval(intervalId);
+   }, []);
 
   //handle form
   const handleChange = (event) => {
