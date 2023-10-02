@@ -72,7 +72,7 @@ const Login = () => {
 
   const multilineContent = (
     <div>
-      Note: Login might take few minutes beacuse server will be inactive due to use of free deployment on render.com <br /><br />
+      Note: First API request might take few minutes beacuse of server inactivity due to use of free deployment on render.com <br /><br />
       Admin account- <br /> 
       email: admin@mail.com <br /> password: 123 <br />
       <br />
