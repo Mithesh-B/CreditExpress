@@ -177,13 +177,13 @@ const Dashboard = () => {
     (loan.loanStatus === "PENDING" && !loan.isAdmin)
   ) {
     return (
-      <div>
-        {" "}
+      <div className="main">
+       
         <div className="hero">
           <div className="h-left">
             <h1 className="h-title">
               Get your loan in <br />2 steps! <br />
-              It's that easy
+              It's that easy.
             </h1>
             <div className="form-bg">
               <form onSubmit={handleSubmit}>

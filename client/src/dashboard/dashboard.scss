@@ -35,23 +35,31 @@
 }
 
 //hero
-.hero {
+
+.main {
   margin: 0;
+  padding: 0;
+  background-color: #f9fdff;
+  background-image: linear-gradient(62deg, #f9fdff 0%, #e2d5ff 100%);
+
+  background-position: center center;
+}
+.hero {
   padding: 2rem;
   display: flex;
   justify-content: space-around;
-  height: 100vh;
+ height: 100dvh;
 
   .h-left {
+    min-width: 45%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
   }
 
   .h-title {
-    font-family: "Stardom", sans-serif;
-    font-size: 4rem;
-    letter-spacing: 3px;
+    font-family: "Cabinet Grotesk", sans-serif;
+    font-size: 4.5rem;
   }
   .h-img {
     display: flex;
@@ -78,6 +86,7 @@
         #e5e5f7 40px
       ),
       repeating-linear-gradient(#1e8f7155, #1e8f7152);
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;
     padding: 20px;
     border-radius: 15px;
     width: 80%;
@@ -140,10 +149,19 @@
 
 @media (max-width: 768px) {
   .hero {
-    padding-top: 1rem;
-    margin-top: 0rem;
+    padding: 1rem;
     flex-direction: column;
-    margin: 0.5rem;
+    justify-content: space-evenly;
+    margin: 0rem;
+
+    .h-left {
+      margin: 0rem;
+      .h-title {
+        font-size: 3rem;
+        margin-top: 1rem;
+        margin-bottom: 2rem;
+      }
+    }
 
     .form-bg {
       width: auto;
