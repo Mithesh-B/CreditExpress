@@ -16,7 +16,12 @@ const Admin = () => {
     axios
       .get(`${import.meta.env.VITE_API}/all-loans`)
       .then((response) => {
-        setData(response.data);
+        // Filter out users with loan status equal to "ADMIN"
+        const filteredData = response.data.filter(
+          (user) => user.loan.status !== "ADMIN"
+        );
+
+        setData(filteredData);
         setLoading(false);
       })
       .catch((error) => {
@@ -46,7 +51,7 @@ const Admin = () => {
         message.error("status is already active");
       });
   };
-//table component is handled using ANTDesign table
+  //table component is handled using ANTDesign table
   const columns = [
     {
       title: "Username",
@@ -57,7 +62,7 @@ const Admin = () => {
       title: "Loan Amount",
       dataIndex: "loan",
       key: "loanAmount",
-      render: (text, record) => record.loan.loanAmount,
+      render: (text, record) => `$${record.loan.loanAmount}`,
     },
     {
       title: "Term",

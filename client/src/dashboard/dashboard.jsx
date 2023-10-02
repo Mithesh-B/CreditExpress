@@ -69,7 +69,7 @@ const Dashboard = () => {
 
       // Handle success
       message.success(
-        "Successfully submitted a loan request, please wait for approval"
+        "Successfully submitted a loan request, please login to admin account to approve it."
       );
 
       // Clear the form fields after submission
@@ -122,7 +122,8 @@ const Dashboard = () => {
   const pendingInstallments =
     loan.loanAmount / (installments.length - lastInstallmentNumber);
 
-  console.log(pendingInstallments);
+
+  
 
   useEffect(() => {
     if (loan && loan.term) {
@@ -157,6 +158,11 @@ const Dashboard = () => {
   const handlePaymentSubmit = (index) => {
     if (installments[index].paymentAmount <= pendingInstallments - 1) {
       message.error("Payment amount must be greater than installment amount.");
+      return;
+    }
+  
+    if (installments[index].paymentAmount > loan?.loanAmount) {
+      message.error("Thanks but we don't accept donations. :-)");
       return;
     }
 
@@ -259,7 +265,7 @@ const Dashboard = () => {
         return loan.installment[index] &&
           loan.installment[index].paymentAmount > 0
           ? "$0.00"
-          : `$${pendingInstallments}`;
+          : `$${pendingInstallments.toFixed(2)}`;
       },
     },
     {
