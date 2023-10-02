@@ -5,6 +5,7 @@ import { Table, Button, Input, message } from "antd";
 import Admin from "../admin/admin";
 import "./dashboard.scss";
 
+const token = localStorage.getItem("token");
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -45,6 +46,7 @@ const Dashboard = () => {
     window.location.reload();
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -57,6 +59,11 @@ const Dashboard = () => {
           term: parseInt(term),
           requestDate: requestDate,
           status: "PENDING",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token
+          },
         }
       );
 
@@ -85,6 +92,7 @@ const Dashboard = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             repaymentAmount: paymentAmount,

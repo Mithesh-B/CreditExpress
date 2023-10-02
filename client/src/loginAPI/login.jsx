@@ -40,6 +40,7 @@ const Login = () => {
         } else {
           window.sessionStorage.setItem("isLoggedIn", true);
           window.sessionStorage.setItem("userID", res.data?.userId);
+          localStorage.setItem("token", res.data?.token);
           window.location.reload();
           Navigate("/");
         }

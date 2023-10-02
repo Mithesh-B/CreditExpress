@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../dashboard/dashboard.scss";
 
+const token = localStorage.getItem("token");
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -26,7 +27,15 @@ const Admin = () => {
   // Make an API POST request to update the status
   const handleActionClick = (loanId) => {
     axios
-      .post(`${import.meta.env.VITE_API}/approve-loan/${loanId}`)
+      .post(
+        `${import.meta.env.VITE_API}/approve-loan/${loanId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token
+          },
+        }
+      )
       .then((response) => {
         // Handle the success response here
         message.success("Status updated successfully");

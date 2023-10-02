@@ -1,4 +1,3 @@
-
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
@@ -6,12 +5,15 @@ const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const User = require("./models/User");
 const cors = require("cors");
+const jsonwebtoken = require("jsonwebtoken");
+var { expressjwt: jwt } = require("express-jwt");
+const { rateLimit } = require("express-rate-limit");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const JWTSecret = process.env.JWT_SECRET;
 //prevent cors error
 app.use(cors());
-
 
 //connect mongoDB (update to .env later)
 mongoose
@@ -29,8 +31,14 @@ mongoose
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+// Define rate limiting options
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Maximum 100 requests per 15 minutes
+});
+
 // Register a new user
-app.post("/register", async (req, res) => {
+app.post("/register", limiter, async (req, res) => {
   try {
     const { username, email, password, isAdmin } = req.body;
 
@@ -45,7 +53,12 @@ app.post("/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     // Create a new user
-    const newUser = new User({ username, email, password: hashedPassword, isAdmin });
+    const newUser = new User({
+      username,
+      email,
+      password: hashedPassword,
+      isAdmin,
+    });
     await newUser.save();
 
     res.status(201).json({ message: "User registered successfully" });
@@ -56,7 +69,7 @@ app.post("/register", async (req, res) => {
 });
 
 // post request to login
-app.post("/login", async (req, res) => {
+app.post("/login", limiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -73,14 +86,31 @@ app.post("/login", async (req, res) => {
     }
 
     // If the login is successful, send the user's ID in the response
-    res.status(200).json({ message: "Login successful", userId: user._id });
+    const token = generateToken(user);
+    res.status(200).json({ message: "Login successful", userId: user._id, token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server error" });
   }
 });
+
+// Middleware for generating JWT token
+function generateToken(user) {
+  return jsonwebtoken.sign(
+    { _id: user._id, isAdmin: user.isAdmin },
+    JWTSecret,
+    { expiresIn: "1d" } // Token expiration time (1 day)
+  );
+}
+
+// Middleware for JWT token validation
+const requireAuth = jwt({
+  secret: JWTSecret,
+  algorithms: ["HS256"],
+});
+
 //post request to avail a loan
-app.post("/loan/:userId", async (req, res) => {
+app.post("/loan/:userId", requireAuth, limiter, async (req, res) => {
   try {
     const { loanAmount, term, requestDate, status } = req.body;
     const userId = req.params.userId;
@@ -119,7 +149,7 @@ app.post("/loan/:userId", async (req, res) => {
 });
 
 //post request for loan repayment
-app.post("/repay/:userId", async (req, res) => {
+app.post("/repay/:userId", requireAuth, limiter, async (req, res) => {
   try {
     const { repaymentAmount, installmentNumber } = req.body;
     const userId = req.params.userId;
@@ -171,9 +201,8 @@ app.post("/repay/:userId", async (req, res) => {
   }
 });
 
-
 //get loan status for specific user
-app.get("/loan-status/:userId", async (req, res) => {
+app.get("/loan-status/:userId", limiter, async (req, res) => {
   try {
     const userId = req.params.userId;
 
@@ -186,11 +215,11 @@ app.get("/loan-status/:userId", async (req, res) => {
     // Return the loan status and other loan details
     const loanStatus = user.loan.status;
     const isLoanPaid = user.loan.isPaid;
-        const loanAmount = user.loan.loanAmount;
-        const term = user.loan.term;
+    const loanAmount = user.loan.loanAmount;
+    const term = user.loan.term;
     const requestDate = user.loan.requestDate;
     const installment = user.loan.installmentPayments;
-    const isAdmin= user.isAdmin
+    const isAdmin = user.isAdmin;
 
     res.status(200).json({
       loanStatus,
@@ -207,7 +236,7 @@ app.get("/loan-status/:userId", async (req, res) => {
   }
 });
 //get all users loan details
-app.get("/all-loans", async (req, res) => {
+app.get("/all-loans", limiter, async (req, res) => {
   try {
     // Find all users with their loan objects
     const users = await User.find({}, { username: 1, loan: 1 });
@@ -219,7 +248,7 @@ app.get("/all-loans", async (req, res) => {
   }
 });
 //post req to update loan status by admin
-app.post("/approve-loan/:userId", async (req, res) => {
+app.post("/approve-loan/:userId", requireAuth, limiter, async (req, res) => {
   try {
     const userId = req.params.userId;
 
@@ -247,10 +276,6 @@ app.post("/approve-loan/:userId", async (req, res) => {
   }
 });
 
-
-
 app.listen(PORT, () => {
   console.log(`Server is running`);
 });
-
-
